@@ -1,27 +1,3 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>Til on Richard Taylor - Developer / CTO</title>
-    <link>https://richt.co.uk/til/</link>
-    <description>Recent content in Til on Richard Taylor - Developer / CTO</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-gb</language>
-    <lastBuildDate>Thu, 21 Sep 2017 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://richt.co.uk/til/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-    <item>
-      <title>TIL: Docker can override UFW rules</title>
-      <link>https://richt.co.uk/til/docker-can-override-ufw-rules/</link>
-      <pubDate>Thu, 21 Sep 2017 00:00:00 +0000</pubDate>
-      
-      <guid>https://richt.co.uk/til/docker-can-override-ufw-rules/</guid>
-      <description>&lt;p&gt;If you&amp;rsquo;re using Ubuntu&amp;rsquo;s Uncomplicated Firewall (UFW) on your host and running
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Til on Richard Taylor - Developer / CTO</title><link>https://richt.co.uk/til/</link><description>Recent content in Til on Richard Taylor - Developer / CTO</description><generator>Hugo -- gohugo.io</generator><language>en-gb</language><lastBuildDate>Thu, 21 Sep 2017 00:00:00 +0000</lastBuildDate><atom:link href="https://richt.co.uk/til/index.xml" rel="self" type="application/rss+xml"/><item><title>TIL: Docker can override UFW rules</title><link>https://richt.co.uk/til/docker-can-override-ufw-rules/</link><pubDate>Thu, 21 Sep 2017 00:00:00 +0000</pubDate><guid>https://richt.co.uk/til/docker-can-override-ufw-rules/</guid><description>&lt;p&gt;If you&amp;rsquo;re using Ubuntu&amp;rsquo;s Uncomplicated Firewall (UFW) on your host and running
 services with Docker mapped ports, these services can bypass your UFW configuration.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
-    </item>
-    
-  </channel>
-</rss>
+&lt;p&gt;&lt;/p&gt;</description></item></channel></rss>
