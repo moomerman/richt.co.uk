@@ -1,10 +1,242 @@
-<html lang=en><meta charset=utf-8><title>USING LAUNCH SCREENS WITH RUBYMOTION | Richard Taylor</title><meta name=description content="A step-by-step guide to using a Launch Screen with RubyMotion"><meta name=viewport content="width=device-width,initial-scale=1"><link rel=alternate type=application/atom+xml href=/index.xml><link rel=icon type=image/png href=/img/icon.png><link rel=manifest href=/manifest.json><link rel=apple-touch-icon href=/img/icon.png><link rel=apple-touch-icon sizes=80x80 href=/img/icon-80.png><link rel=apple-touch-icon sizes=120x120 href=/img/icon-120.png><link rel=apple-touch-icon sizes=180x180 href=/img/icon-180.png><style>body{font:18px/1.4 system-ui,sans-serif;margin:auto;max-width:40em}body,pre{padding:1em}h1,h2,h3,h4,h5,h6{line-height:normal}a{text-decoration:none}a:hover{text-decoration:underline}img,video,pre{margin:2em auto 2em}img,video{max-width:100%;display:block}pre,code{font:.9em Monaco,monospace;overflow-x:auto}blockquote{font-style:italic}footer,nav{font-size:.8em;width:100%}footer{margin:2em 0 1em;text-align:center}nav{text-transform:uppercase;padding-bottom:5px}nav ul{list-style-type:none;margin:0;padding:0}nav li{display:inline;margin-right:1em}nav a.active{text-decoration:underline}</style><style>body{background-color:#132338;color:#bbc9d9}h1,h2,h3,h4,h5,h6{color:#fff}a{color:#ffc24f}p code{color:#adcc2b}blockquote{color:#696969}footer,nav{color:#b8bdc3}nav a,footer a{color:#9cb3c9}</style><link rel=canonical href=https://www.richt.co.uk/articles/using-launch-screens-rubymotion/><meta property=og:title content="Using Launch Screens with RubyMotion"><meta property=og:description content="A step-by-step guide to using a Launch Screen with RubyMotion"><meta property=og:url content=https://www.richt.co.uk/articles/using-launch-screens-rubymotion/><meta property=og:site_name content=www.richt.co.uk><meta property=og:type content=article><meta name=twitter:card content=summary_large_image><meta name=twitter:image content=https://www.richt.co.uk/articles/using-launch-screens-rubymotion/header.jpg><meta property=og:image content=https://www.richt.co.uk/articles/using-launch-screens-rubymotion/header.jpg><meta name=twitter:site content=@moomerman><meta name=twitter:title content="Using Launch Screens with RubyMotion"><meta name=twitter:description content="A step-by-step guide to using a Launch Screen with RubyMotion"><nav><ul><li><a href=/>HOME</a><li><a href=https://www.richt.co.uk/articles/ class=active>Articles</a><li><a href=https://www.richt.co.uk/til/>Til</a></ul></nav><article><h1>Using Launch Screens with RubyMotion</h1><small style=display:block;position:relative;top:-15px><a href=https://rd.gl/me rel=author>Richard Taylor</a>
-• <time>November 2014</time>
-• 2m read</small>
-<img src=header.jpg alt style=margin-top:5px><p>Maintaining multiple launch screen images for different devices has always been a pain in iOS. Thankfully since iOS8 you can now use a custom view that can automatically adapt to different screen sizes.<p><p>In this post I&rsquo;ll show you how to achieve this using RubyMotion.<h2 id=interface-builder>Interface Builder</h2><p>I&rsquo;m not a fan of using Xcode for all my views but I think there are a couple of scenarios like this where it is a distinct advantage. In order to use the XCode editor for your RubyMotion project, you&rsquo;ll need to install the ib gem and run <code>bundle</code>.<p><code>Gemfile</code><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby>source <span style=color:#e6db74>&#39;https://rubygems.org&#39;</span>
-<span style=color:#f92672>...</span>
-gem <span style=color:#e6db74>&#39;ib&#39;</span></code></pre></div><p>Now you can run <code>rake ib:open</code> which will open your RubyMotion project in Xcode.<h2 id=creating-a-launch-screen>Creating a Launch Screen</h2><p>The first thing we want to do is create a new Launch Screen file.<p>In Xcode, expand the ib folder in the left-hand navigator to reveal the Resources directory. This Resources dir maps directly to the resources folder in your RubyMotion project.<p><img src=xcode.png alt=Navigator><p>Right click on Resources, choose New File&hellip; and create a new iOS &gt; User Interface &gt; Launch Screen. You can call yours whatever you like, I imaginitively went with LaunchScreen.<p><img src=new-launch-screen.png alt="Create launch screen"><p>By default Xcode creates a new view that has a label with the name of your project, in this case <code>ib</code>. I changed the text to <code>76things</code> in this example. At this point you can start customising the view to suit your needs, for example adding a logo for your app.<p><img src=interface-builder.png alt=Customise><p>All that is now left to do is tell RubyMotion to use this screen as the launch screen.<p><code>Rakefile</code><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-ruby data-lang=ruby><span style=color:#66d9ef>Motion</span><span style=color:#f92672>::</span><span style=color:#66d9ef>Project</span><span style=color:#f92672>::</span><span style=color:#66d9ef>App</span><span style=color:#f92672>.</span>setup <span style=color:#66d9ef>do</span> <span style=color:#f92672>|</span>app<span style=color:#f92672>|</span>
-  <span style=color:#f92672>...</span>
-  app<span style=color:#f92672>.</span>info_plist<span style=color:#f92672>[</span><span style=color:#e6db74>&#39;UILaunchStoryboardName&#39;</span><span style=color:#f92672>]</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;LaunchScreen&#39;</span>
-<span style=color:#66d9ef>end</span></code></pre></div><p>And that&rsquo;s it! You now have a custom view for your launch screen that works nicely for all different screen sizes. If your launch screen is complex you can also take advantage of Auto Layout constraints.<h2 id=result>Result</h2><p><img src=result.png alt="Using a Storyboard"><p>We chose to use a Launch Screen when creating in Xcode but you can also use a blank Storyboard to achieve the same result. It requires a bit more work adding a View Controller and I&rsquo;m not sure what advantage that would bring but it might be useful to know. See the resources below for more information.<h3 id=resources>Resources</h3><ul><li><a href=https://developer.apple.com/ios/human-interface-guidelines/icons-and-images/launch-screen/>Apple Developer - Launch Screen</a><li><a href=http://oleb.net/blog/2014/08/replacing-launch-images-with-storyboards>Replacing launch images with storyboards</a><li><a href=https://github.com/rubymotion/ib>rubymotion/ib</a></ul></article><footer>&copy; 2018 <a href=https://rd.gl/me>RICHARD TAYLOR</a>
-&nbsp;♥&nbsp; <a href=/>HOME</a></footer>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>USING LAUNCH SCREENS WITH RUBYMOTION | Richard Taylor</title>
+  <meta name="description" content="A step-by-step guide to using a Launch Screen with RubyMotion">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="alternate" type="application/atom+xml" href="/index.xml">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/img/icon.png">
+  <link rel="apple-touch-icon" sizes="80x80" href="/img/icon-80.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/img/icon-120.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/icon-180.png">
+
+  <style>
+  body {
+    font: 18px/1.4 system-ui, sans-serif;
+    margin: auto;
+    max-width: 40em
+  }
+
+  body,
+  pre {
+    padding: 1em
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: normal
+  }
+
+  a {
+    text-decoration: none
+  }
+
+  a:hover {
+    text-decoration: underline
+  }
+
+  img,
+  video,
+  pre {
+    margin: 2em auto 2em
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    display: block
+  }
+
+  pre,
+  code {
+    font: 0.9em Monaco, monospace;
+    overflow-x: auto
+  }
+
+  blockquote {
+    font-style: italic
+  }
+
+  footer,
+  nav {
+    font-size: .8em;
+    width: 100%
+  }
+
+  footer {
+    margin: 2em 0 1em;
+    text-align: center
+  }
+
+  nav {
+    text-transform: uppercase;
+    padding-bottom: 5px
+  }
+
+  nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0
+  }
+
+  nav li {
+    display: inline;
+    margin-right: 1em
+  }
+
+  nav a.active {
+    text-decoration: underline
+  }
+</style>
+
+  <style>
+  body {
+    background-color: #132338;
+    color: #bbc9d9
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #fff
+  }
+
+  a {
+    color: #ffc24f
+  }
+
+  p code {
+    color: #adcc2b
+  }
+
+  blockquote {
+    color: #696969
+  }
+
+  footer,
+  nav {
+    color: #b8bdc3
+  }
+
+  nav a,
+  footer a {
+    color: #9cb3c9
+  }
+</style>
+
+  
+<link rel="canonical" href="https://www.richt.co.uk/articles/using-launch-screens-rubymotion/" />
+<meta property="og:title" content="Using Launch Screens with RubyMotion" />
+<meta property="og:description" content="A step-by-step guide to using a Launch Screen with RubyMotion" />
+<meta property="og:url" content="https://www.richt.co.uk/articles/using-launch-screens-rubymotion/" />
+<meta property="og:site_name" content="www.richt.co.uk" />
+<meta property="og:type" content="article" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://www.richt.co.uk/articles/using-launch-screens-rubymotion/header.jpg" />
+  <meta property="og:image" content="https://www.richt.co.uk/articles/using-launch-screens-rubymotion/header.jpg"/>
+
+<meta name="twitter:site" content="@moomerman" />
+<meta name="twitter:title" content="Using Launch Screens with RubyMotion" />
+<meta name="twitter:description" content="A step-by-step guide to using a Launch Screen with RubyMotion" />
+
+
+</head>
+
+<body>
+
+<nav>
+  <ul>
+    <li><a href="/">HOME</a></li>
+    
+    
+      <li><a href="https://www.richt.co.uk/articles/" class="active">Articles</a></li>
+    
+      <li><a href="https://www.richt.co.uk/til/">Til</a></li>
+    
+  </ul>
+</nav>
+
+
+<article>
+  <h1>Using Launch Screens with RubyMotion</h1>
+  <small style="display:block; position:relative; top:-15px;">
+    <a href="https://rd.gl/me" rel="author">Richard Taylor</a>
+    • <time>November 2014</time>
+    • 2m read
+  </small>
+  <img src="header.jpg" alt="" style="margin-top: 5px"/>
+  <p>Maintaining multiple launch screen images for different devices has always been a pain in iOS. Thankfully since iOS8 you can now use a custom view that can automatically adapt to different screen sizes.</p>
+
+<p></p>
+
+<p>In this post I&rsquo;ll show you how to achieve this using RubyMotion.</p>
+
+<h2 id="interface-builder">Interface Builder</h2>
+
+<p>I&rsquo;m not a fan of using Xcode for all my views but I think there are a couple of scenarios like this where it is a distinct advantage. In order to use the XCode editor for your RubyMotion project, you&rsquo;ll need to install the ib gem and run <code>bundle</code>.</p>
+
+<p><code>Gemfile</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">source <span style="color:#e6db74">&#39;https://rubygems.org&#39;</span>
+<span style="color:#f92672">...</span>
+gem <span style="color:#e6db74">&#39;ib&#39;</span></code></pre></div>
+<p>Now you can run <code>rake ib:open</code> which will open your RubyMotion project in Xcode.</p>
+
+<h2 id="creating-a-launch-screen">Creating a Launch Screen</h2>
+
+<p>The first thing we want to do is create a new Launch Screen file.</p>
+
+<p>In Xcode, expand the ib folder in the left-hand navigator to reveal the Resources directory. This Resources dir maps directly to the resources folder in your RubyMotion project.</p>
+
+<p><img src="xcode.png" alt="Navigator" /></p>
+
+<p>Right click on Resources, choose New File&hellip; and create a new iOS &gt; User Interface &gt; Launch Screen. You can call yours whatever you like, I imaginitively went with LaunchScreen.</p>
+
+<p><img src="new-launch-screen.png" alt="Create launch screen" /></p>
+
+<p>By default Xcode creates a new view that has a label with the name of your project, in this case <code>ib</code>. I changed the text to <code>76things</code> in this example. At this point you can start customising the view to suit your needs, for example adding a logo for your app.</p>
+
+<p><img src="interface-builder.png" alt="Customise" /></p>
+
+<p>All that is now left to do is tell RubyMotion to use this screen as the launch screen.</p>
+
+<p><code>Rakefile</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#66d9ef">Motion</span><span style="color:#f92672">::</span><span style="color:#66d9ef">Project</span><span style="color:#f92672">::</span><span style="color:#66d9ef">App</span><span style="color:#f92672">.</span>setup <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>app<span style="color:#f92672">|</span>
+  <span style="color:#f92672">...</span>
+  app<span style="color:#f92672">.</span>info_plist<span style="color:#f92672">[</span><span style="color:#e6db74">&#39;UILaunchStoryboardName&#39;</span><span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;LaunchScreen&#39;</span>
+<span style="color:#66d9ef">end</span></code></pre></div>
+<p>And that&rsquo;s it! You now have a custom view for your launch screen that works nicely for all different screen sizes. If your launch screen is complex you can also take advantage of Auto Layout constraints.</p>
+
+<h2 id="result">Result</h2>
+
+<p><img src="result.png" alt="Using a Storyboard" /></p>
+
+<p>We chose to use a Launch Screen when creating in Xcode but you can also use a blank Storyboard to achieve the same result. It requires a bit more work adding a View Controller and I&rsquo;m not sure what advantage that would bring but it might be useful to know. See the resources below for more information.</p>
+
+<h3 id="resources">Resources</h3>
+
+<ul>
+<li><a href="https://developer.apple.com/ios/human-interface-guidelines/icons-and-images/launch-screen/">Apple Developer - Launch Screen</a></li>
+<li><a href="http://oleb.net/blog/2014/08/replacing-launch-images-with-storyboards">Replacing launch images with storyboards</a></li>
+<li><a href="https://github.com/rubymotion/ib">rubymotion/ib</a></li>
+</ul>
+</article>
+
+  
+    <footer>
+        &copy; 2018 <a href="https://rd.gl/me">RICHARD TAYLOR</a>
+        &nbsp;♥&nbsp; <a href="/">HOME</a>
+    </footer>
+  
+</body>
+</html>
+
