@@ -1,0 +1,401 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>BUILDING A BBC SOUNDS &#39;STATUS BAR&#39; APP FOR MACOS | Richard Taylor</title>
+  <meta name="description" content="The documentation of what I discovered while building a WebKit view status bar app for macOS with native media key support controlling the playback in the WebView.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="alternate" type="application/atom+xml" href="/index.xml">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/img/icon.png">
+  <link rel="apple-touch-icon" sizes="80x80" href="/img/icon-80.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/img/icon-120.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/icon-180.png">
+
+  <style>
+  body {
+    font: 18px/1.4 system-ui, sans-serif;
+    margin: auto;
+    max-width: 40em
+  }
+
+  body,
+  pre {
+    padding: 1em
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: normal
+  }
+
+  a {
+    text-decoration: none
+  }
+
+  a:hover {
+    text-decoration: underline
+  }
+
+  img,
+  video,
+  pre {
+    margin: 2em auto 2em
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    display: block
+  }
+
+  pre,
+  code {
+    font: 0.9em Monaco, monospace;
+    overflow-x: auto
+  }
+
+  blockquote {
+    font-style: italic
+  }
+
+  footer,
+  nav {
+    font-size: .8em;
+    width: 100%
+  }
+
+  footer {
+    margin: 2em 0 1em;
+    text-align: center
+  }
+
+  nav {
+    text-transform: uppercase;
+    padding-bottom: 5px
+  }
+
+  nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0
+  }
+
+  nav li {
+    display: inline;
+    margin-right: 1em
+  }
+
+  nav a.active {
+    text-decoration: underline
+  }
+</style>
+
+  <style>
+  body {
+    background-color: #132338;
+    color: #bbc9d9
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #fff
+  }
+
+  a {
+    color: #ffc24f
+  }
+
+  p code {
+    color: #adcc2b
+  }
+
+  blockquote {
+    color: #696969
+  }
+
+  footer,
+  nav {
+    color: #b8bdc3
+  }
+
+  nav a,
+  footer a {
+    color: #9cb3c9
+  }
+</style>
+
+  
+<link rel="canonical" href="https://www.richt.co.uk/articles/building-bbc-sounds-app-for-macos/" />
+<meta property="og:title" content="Building a BBC Sounds &#39;status bar&#39; app for macOS" />
+<meta property="og:description" content="The documentation of what I discovered while building a WebKit view status bar app for macOS with native media key support controlling the playback in the WebView." />
+<meta property="og:url" content="https://www.richt.co.uk/articles/building-bbc-sounds-app-for-macos/" />
+<meta property="og:site_name" content="www.richt.co.uk" />
+<meta property="og:type" content="article" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://www.richt.co.uk/articles/building-bbc-sounds-app-for-macos/sounds.png" />
+  <meta property="og:image" content="https://www.richt.co.uk/articles/building-bbc-sounds-app-for-macos/sounds.png"/>
+
+<meta name="twitter:site" content="@moomerman" />
+<meta name="twitter:title" content="Building a BBC Sounds &#39;status bar&#39; app for macOS" />
+<meta name="twitter:description" content="The documentation of what I discovered while building a WebKit view status bar app for macOS with native media key support controlling the playback in the WebView." />
+
+
+</head>
+
+<body>
+
+<nav>
+  <ul>
+    <li><a href="/">HOME</a></li>
+    
+    
+      <li><a href="https://www.richt.co.uk/articles/" class="active">Articles</a></li>
+    
+      <li><a href="https://www.richt.co.uk/til/">Til</a></li>
+    
+  </ul>
+</nav>
+
+
+<article>
+  <h1>Building a BBC Sounds &#39;status bar&#39; app for macOS</h1>
+  <small style="display:block; position:relative; top:-15px;">
+    <a href="https://rd.gl/me" rel="author">Richard Taylor</a>
+    • <time>January 2019</time>
+    • 6m read
+  </small>
+  <img src="sounds.png" alt="" style="margin-top: 5px"/>
+  <p>The documentation of what I discovered while building a WebKit view status bar
+app for macOS with native media key support controlling the playback in the WebView.</p>
+
+<h2 id="background">Background</h2>
+
+<p>I listen to the radio a lot while developing and after trying the available
+apps at the time I wrote a <a href="https://github.com/moomerman/motion-radio">simple native status bar app</a> a few years ago in Ruby using the
+RubyMotion compiler toolkit.</p>
+
+<p><img src="radio.png" alt="Radio App" /></p>
+
+<p>This allows you to simply switch between a preset list of radio streams
+and has media key support so you can pause/play and change station with the
+forward/back keys.</p>
+
+<p>This is probably my most used app on the mac but it lacks a lot of features
+I really want and I have intended to revisit it for a while.</p>
+
+<p>Having a few rare hours to spare over Christmas this year I started to have a
+look at what was available and determined that a WebView app of the
+relatively new <a href="https://www.bbc.co.uk/sounds">BBC Sounds</a> web app would be ideal,
+the main criteria being:</p>
+
+<ul>
+<li>Native status bar app</li>
+<li>WebKit webview of the BBC Sounds site</li>
+<li>Media key support for pause/play from the keyboard</li>
+</ul>
+
+<h2 id="existing-tools">Existing tools</h2>
+
+<p>There are a couple of projects I&rsquo;d heard of that assisted you writing apps that
+wrap websites in web views so I thought I&rsquo;d start there.</p>
+
+<p>The <a href="https://github.com/zserge/webview">webview</a> golang project assists you in writing a
+native app with cross-platform support (windows, mac, linux) very simply, this is
+literally all you need:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#f92672">package</span> <span style="color:#a6e22e">main</span>
+
+<span style="color:#f92672">import</span> <span style="color:#e6db74">&#34;github.com/zserge/webview&#34;</span>
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">main</span>() {
+	<span style="color:#a6e22e">webview</span>.<span style="color:#a6e22e">Open</span>(<span style="color:#e6db74">&#34;BBC Sounds&#34;</span>,
+		<span style="color:#e6db74">&#34;https://www.bbc.co.uk/sounds/play/live:bbc_6music&#34;</span>, <span style="color:#ae81ff">400</span>, <span style="color:#ae81ff">600</span>, <span style="color:#66d9ef">true</span>)
+}</code></pre></div>
+<p>It really couldn&rsquo;t be any simpler to get started and results in a native player,
+job done!</p>
+
+<p><img src="webview.png" alt="webview App" /></p>
+
+<p>The only downside to this great project is that it abstracts so much away from you
+there isn&rsquo;t really any room for customisation, unless you want to get your hands
+dirty with C so it doesn&rsquo;t really meet all my criteria.</p>
+
+<p>The <a href="https://github.com/djyde/WebShell">WebShell</a> project looked
+like it would allow for more customisation at the expense of the cross-platform
+support (which isn&rsquo;t essential for me).</p>
+
+<p>Following the instructions and doing a little bit of configuration I had a
+player up and running with almost the same results as the webview app.  WebShell
+also allows you to configure it as a status bar app and has references to the media
+keys in the code so I thought I&rsquo;d hit the jackpot.</p>
+
+<p>Unfortunately there were a number of major bugs, eg. 2 audio streams playing at
+the same time and the media keys not doing anything for me that meant it wasn&rsquo;t
+going to work.</p>
+
+<p>I figured it would be a good starting point though but after
+devling deeper into the code I realised it was doing so much more that I would need
+(or understand) that I wouldn&rsquo;t be happy maintaining my fork, if I could even
+get it working as I wanted.</p>
+
+<p>At this point though I was starting to understand what was needed to make it work,
+and had a great reference app to look at I decided to have a go building it from scratch.</p>
+
+<h2 id="building-the-solution">Building the solution</h2>
+
+<p>I cracked open a new macOS app in Xcode and found this great tutorial <a href="https://www.raywenderlich.com/450-menus-and-popovers-in-menu-bar-apps-for-macos">Menus and Popovers in Menu Bar Apps for macOS</a>
+that walks you through building a simple status bar app with a popover.  This <a href="http://footle.org/WeatherBar/">WeatherBar</a> tutorial was also really useful as a second reference.  I&rsquo;m not going to duplicate the setup steps of these tutorials here.</p>
+
+<p>The main gist of the code that gets this working (in the <code>AppDelegate</code>) is:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">let</span> statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+<span style="color:#66d9ef">let</span> popover = NSPopover()
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">applicationDidFinishLaunching</span>(<span style="color:#66d9ef">_</span> aNotification: Notification) {
+  <span style="color:#66d9ef">let</span> icon = NSImage(named: <span style="color:#e6db74">&#34;status&#34;</span>)
+  icon?.isTemplate = <span style="color:#66d9ef">true</span>
+  <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> button = statusItem.button {
+      button.image = icon
+      button.action = <span style="color:#66d9ef">#selector</span>(togglePopover(<span style="color:#66d9ef">_</span>:))
+  }
+}
+
+<span style="color:#66d9ef">@objc</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">togglePopover</span>(<span style="color:#66d9ef">_</span> sender: Any?) {
+    <span style="color:#66d9ef">if</span> popover.isShown {
+        closePopover(sender: sender)
+    } <span style="color:#66d9ef">else</span> {
+        showPopover(sender: sender)
+    }
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">showPopover</span>(sender: Any?) {
+    <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> button = statusItem.button {
+        popover.show(relativeTo: button.bounds, of: button, preferredEdge: NSRectEdge.minY)
+    }
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">closePopover</span>(sender: Any?) {
+    popover.performClose(sender)
+}</code></pre></div>
+<p>Once the popup was showing I needed to get a WebView in there and this incredible
+article <a href="https://www.hackingwithswift.com/articles/112/the-ultimate-guide-to-wkwebview">The Ultimate Guide to WKWebView</a> was my frequent reference.</p>
+
+<p>The main detail of the implementation here (in a <code>WebViewController</code>) is:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">var</span> webView: WKWebView<span style="color:#f92672">!</span>
+
+<span style="color:#66d9ef">override</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">loadView</span>() {
+    <span style="color:#66d9ef">let</span> webConfiguration = WKWebViewConfiguration()
+    webView = WKWebView(frame: .zero, configuration: webConfiguration)
+    view = webView
+}
+
+<span style="color:#66d9ef">override</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">viewDidLoad</span>() {
+    <span style="color:#66d9ef">super</span>.viewDidLoad()
+    loadURL(URL(string:<span style="color:#e6db74">&#34;https://www.bbc.co.uk/sounds/play/live:bbc_6music&#34;</span>)<span style="color:#f92672">!</span>)
+}
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">loadURL</span>(<span style="color:#66d9ef">_</span> url: URL) {
+    webView.load(URLRequest(url: url))
+}</code></pre></div>
+<p>At this point the content failed to load, and I discovered I needed to add a
+permission to the app to be a network client, apparently this is a relatively
+new sandbox security feature in macOS.</p>
+
+<p><img src="capabilities.png" alt="Capabilities" /></p>
+
+<p>With the content loading we have a functional status bar player!  One drawback
+was that that the audio failed to play automatically until the popover was
+opened.  I couldn&rsquo;t find a perfect solution to this but hacked in a quick
+open/close on launch that worked around it in <code>AppDelegate</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift">DispatchQueue.main.async {
+    <span style="color:#66d9ef">self</span>.showPopover(sender: <span style="color:#66d9ef">self</span>)
+    <span style="color:#66d9ef">self</span>.closePopover(sender: <span style="color:#66d9ef">self</span>)
+}</code></pre></div>
+<p>If you know of a better way of handling this please let me know!</p>
+
+<p>The next part of the puzzle is getting the media keys controlling the player
+within the WebView.</p>
+
+<p>I&rsquo;ve used the <a href="https://github.com/nevyn/SPMediaKeyTap">SPMediaKeyTap</a> project
+before in the previous player and it worked great.  After looking for alternative
+solutions that didn&rsquo;t seem to work I found the successor project <a href="https://github.com/nhurden/MediaKeyTap">MediaKeyTap</a> for swift and it worked a treat.</p>
+
+<p>The main gist of the code in <code>AppDelegate</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">var</span> webController: WebViewController?
+<span style="color:#66d9ef">var</span> mediaKeyTap: MediaKeyTap?
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">applicationDidFinishLaunching</span>(<span style="color:#66d9ef">_</span> aNotification: Notification) {
+  ...
+  mediaKeyTap = MediaKeyTap(delegate: <span style="color:#66d9ef">self</span>)
+  mediaKeyTap?.start()
+}
+
+<span style="color:#66d9ef">func</span> <span style="color:#a6e22e">handle</span>(mediaKey: MediaKey, event: KeyEvent) {
+    <span style="color:#66d9ef">switch</span> mediaKey {
+    <span style="color:#66d9ef">case</span> .playPause:
+        webController?.togglePlay()
+    <span style="color:#66d9ef">case</span> .previous, .rewind:
+        webController?.start()
+    <span style="color:#66d9ef">case</span> .next, .fastForward:
+        webController?.live()
+    }
+}</code></pre></div>
+<p>This basically just forwards the media key press events to the webview controller.</p>
+
+<p>One gotcha here is that macOS requires you have the accessibilty permission
+for the app to receive the events. Under <code>Security &amp; Privacy</code> in macOS settings you need to add the app.</p>
+
+<p><img src="security-privacy.png" alt="Security &amp; Privacy" /></p>
+
+<p>The app will prompt you to do this on first launch, but you need to restart the
+app after adding the permission, I couldn&rsquo;t find a way of responding to any
+changes in this setting within the running app. If you know a way please let
+me know.</p>
+
+<p>The last step is to respond to the key events by executing javascript in the
+web view.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-swift" data-lang="swift"><span style="color:#66d9ef">var</span> webView: WKWebView<span style="color:#f92672">!</span>
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">togglePlay</span>() {
+    execJS(<span style="color:#e6db74">&#34;document.getElementById(</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">smphtml5iframesmp-wrapper</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">).contentWindow.document.getElementById(</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">p_audioui_playpause</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">).click()&#34;</span>)
+}
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">live</span>() {
+    execJS(<span style="color:#e6db74">&#34;document.getElementById(</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">smphtml5iframesmp-wrapper</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">).contentWindow.document.getElementById(</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">p_audioui_toLiveButton</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">).click()&#34;</span>)
+}
+
+<span style="color:#66d9ef">public</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">start</span>() {
+    execJS(<span style="color:#e6db74">&#34;document.getElementById(</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">smphtml5iframesmp-wrapper</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">).contentWindow.document.getElementById(</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">p_audioui_backToStartButton</span><span style="color:#ae81ff">\&#34;</span><span style="color:#e6db74">).click()&#34;</span>)
+}
+
+<span style="color:#66d9ef">private</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">execJS</span>(<span style="color:#66d9ef">_</span> js: String) {
+    webView.evaluateJavaScript(js) { (result, error) <span style="color:#66d9ef">in</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">let</span> error = error {
+            print(error)
+        }
+    }
+}</code></pre></div>
+<p>And that&rsquo;s it! We have a BBC Sounds app with native media key controls and now
+I can get back to work :)  I really like having the playlist available in the
+app too, you can just scroll down to see what is playing and explore further.</p>
+
+<p><img src="tracks.png" alt="Sounds App" /></p>
+</article>
+
+  
+    <footer>
+        &copy; 2019 <a href="https://rd.gl/me">RICHARD TAYLOR</a>
+        &nbsp;♥&nbsp; <a href="/">HOME</a>
+    </footer>
+  
+</body>
+</html>
+
